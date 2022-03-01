@@ -4,8 +4,10 @@
 #include <unistd.h>
 
 int main() {
-  void* addr = (void*) (0xfabada >> 12 << 12);
-  void *r = mmap(addr, 1 << 12, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
+  long pagesz = sysconf(_SC_PAGESIZE);
+
+  void* addr = (void*) ((long)0xfabada & (~(pagesz - 1)));
+  void *r = mmap(addr, pagesz, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
 
   if (r == MAP_FAILED) {
     perror("mmap");
